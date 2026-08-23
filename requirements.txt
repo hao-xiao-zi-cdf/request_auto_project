@@ -1,1 +1,12 @@
-jsonpath
+# 测试框架
+pytest==9.1.1
+# Allure 报告（allure-pytest 会自动依赖 allure-python-commons）
+allure-pytest==2.16.0
+# HTTP 请求
+requests==2.34.2
+# YAML 测试数据读写
+PyYAML==6.0.3
+# JSON 路径提取与断言
+jsonpath==0.82.2
+# MySQL 数据库（datadb_init 数据预置/清理用）
+PyMySQL==1.2.0
