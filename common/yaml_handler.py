@@ -7,20 +7,20 @@ from config.setting import FILE_PATH
 
 def get_testcase_yaml(file):
     """
-    读取测试用例 yaml 文件
-    当只有一个用例组时，将 baseInfo 与每个 testCase 组合后返回
-    当有多个用例组时，直接返回原始数据
+    读取测试用例 yaml 文件，将 baseInfo 与每条 testCase 组合
+    :param file: yaml 测试用例文件路径
+    :return: [[baseInfo1, testCase1], [baseInfo1, testCase2],[baseInfo2, testCase1]...] 格式的列表
+             读取失败时返回 None
     """
+    testcase_list = []
     try:
         with open(file, 'r', encoding='utf-8') as f:
             data = yaml.safe_load(f)
-        # 单个用例组：提取 baseInfo 与每个 testCase 配对
-        if len(data) <= 1:
-            yam_data = data[0]
-            base_info = yam_data.get('baseInfo')
-            return [[base_info, ts] for ts in yam_data.get('testCase')]
-        # 多个用例组：直接返回
-        return data
+            for item in data:
+                base_info = item.get('baseInfo')
+                for ts in item.get('testCase'):
+                    testcase_list.append([base_info, ts])
+            return testcase_list
     except UnicodeDecodeError:
         logs.error(f"[{file}] 文件编码格式错误，请确保 yaml 文件为 UTF-8 格式")
     except FileNotFoundError:
@@ -49,25 +49,33 @@ class YamlHandler:
 
     def write_yaml_data(self, value):
         """
-        追加写入 dict 数据到 extract.yaml（用于接口关联）
+        写入 dict 数据到 extract.yaml（用于接口关联）
+        采用"读旧数据→合并→整体写回"方式，同名 key 新值覆盖旧值，避免文件中出现重复 key
         :param value: 写入数据，必须为 dict
         """
         file_path = FILE_PATH['EXTRACT']
         # 目录不存在时自动创建
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
+        if not isinstance(value, dict):
+            logs.info('写入 [extract.yaml] 的数据必须为 dict 格式')
+            return
         try:
-            with open(file_path, 'a', encoding='utf-8') as f:
-                if isinstance(value, dict):
-                    yaml.dump(value, f, allow_unicode=True, sort_keys=False)
-                else:
-                    logs.info('写入 [extract.yaml] 的数据必须为 dict 格式')
+            # 读取已有数据并与新数据合并（新值覆盖旧值）
+            ext_data = {}
+            if os.path.exists(file_path):
+                with open(file_path, 'r', encoding='utf-8') as rf:
+                    ext_data = yaml.safe_load(rf) or {}
+            ext_data.update(value)
+            # 整体写回，保证 key 不重复
+            with open(file_path, 'w', encoding='utf-8') as f:
+                yaml.dump(ext_data, f, allow_unicode=True, sort_keys=False)
         except Exception:
             logs.error(traceback.format_exc())
 
     def clear_yaml_data(self):
         """清空 extract.yaml 文件数据"""
         with open(FILE_PATH['EXTRACT'], 'w') as f:
-            f.truncate()
+            f.truncate() # 是清空文件内容
 
     def get_extract_yaml(self, node_name, second_node_name=None):
         """
