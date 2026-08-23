@@ -1,0 +1,54 @@
+# 放业务运行所需的环境数据——接口地址、数据库账号、邮箱、Jenkins、机器人密钥，随环境变化
+
+# 测试环境配置
+environment:
+  type: 测试环境
+  project: 风铃选品接口自动化测试项目
+  description: 这是一个测试环境配置文件
+
+# 接口测试环境配置
+api_envi:
+  host: http://127.0.0.1:8787
+
+# MySQL 数据库配置
+MYSQL:
+  host: http://127.0.0.1
+  port: 3306
+  username: root
+  password: root
+  database: test
+
+# 邮件通知配置
+EMAIL:
+  host: smtp.163.com
+  port: 25
+  user: 1355959555@163.com
+  # 邮箱密钥
+  passwd: NGpr5gsyJcQsEbDz
+  # 多个收件人用分号分隔
+  addressee: 1355959555@163.com;3425588767@qq.com
+  subject: 风铃选品接口自动化测试
+
+# JENKINS配置
+JENKINS:
+  url: http://127.0.0.1:8080
+  username: admin
+  password: 123456
+  job_name: interface_test  # 测试任务名称
+  timeout: 60
+
+# 报告类型：默认 allure，若设为 tm 则生成 tmreport 报告
+REPORT_TYPE:
+  type: allure
+
+# 钉钉通知配置
+DING_DING:
+  WEBHOOK_URL: https://oapi.dingtalk.com/robot/send?access_token=895a7c429e8bd54536123be9d1d17f24c8a684411c3f438ce1a7b84a716b586f
+  SECRET: SECcd03007f37a55da9144cbc89a98313377a61e64db36c7f591a7cf3265fe55c93
+
+# 飞书通知配置
+FEI_SHU:
+  WEBHOOK_URL: https://open.feishu.cn/open-apis/bot/v2/hook/2e2519c6-dc12-4561-838b-43ab30cbc1ab
+  SECRET: TgVLNMn3ZC4K6xMb1Truc
+
+
