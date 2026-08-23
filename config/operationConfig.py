@@ -1,57 +1,56 @@
+import yaml
 import traceback
-import configparser
 from config import setting
 # from common.recordlog import logs
 
 
 class OperationConfig:
-    """封装读取 *.ini 配置文件的工具类"""
+    """封装读取 *.yaml 配置文件的工具类"""
 
     def __init__(self, filepath=None):
         # 未传入路径时使用默认配置路径
         self.__filepath = filepath or setting.FILE_PATH['CONFIG']
-
-        self.conf = configparser.ConfigParser()
         try:
-            self.conf.read(self.__filepath, encoding='utf-8')
+            with open(self.__filepath, 'r', encoding='utf-8') as f:
+                self.conf = yaml.safe_load(f)
         except Exception as e:
             print(f"读取配置文件失败: {e}")
+            self.conf = {}
 
         self.type = self.get_report_type('type')
 
     def get_item_value(self, section_name):
         """
-        :param section_name: 根据ini文件的头部值获取全部值
-        :return:以字典形式返回
+        根据 yaml 文件的顶级 key 获取该段下所有键值对
+        :param section_name: 顶级段名
+        :return: 以字典形式返回
         """
-        return dict(self.conf.items(section_name))
+        return dict(self.conf.get(section_name, {}))
 
     def get_section_for_data(self, section, option):
         """
         根据 section 和 option 获取对应的配置值
-        :param section: ini 文件段名
-        :param option: 段下的选项名
-        :return: 配置值字符串，读取失败时返回空字符串
+        :param section: 顶级段名
+        :param option: 段下的键名
+        :return: 配置值，读取失败时返回空字符串
         """
         try:
-            return self.conf.get(section, option)
-        except Exception as e:
+            return self.conf[section][option]
+        except (KeyError, TypeError) as e:
             print(f"读取配置项 [{section}] -> [{option}] 失败: {e}")
             return ''
 
     def write_config_data(self, section, option_key, option_value):
         """
-        向 ini 配置文件中写入数据（仅当 section 不存在时写入）
-        :param section: 段名
-        :param option_key: 选项值 key
-        :param option_value: 选项值 value
+        向 yaml 配置文件中写入数据（仅当 section 不存在时写入）
+        :param section: 顶级段名
+        :param option_key: 键名
+        :param option_value: 键值
         """
-        if section not in self.conf.sections():
-            # 添加一个section值
-            self.conf.add_section(section)
-            self.conf.set(section, option_key, option_value)
+        if section not in self.conf:
+            self.conf[section] = {option_key: option_value}
             with open(self.__filepath, 'w', encoding='utf-8') as f:
-                self.conf.write(f)
+                yaml.dump(self.conf, f, allow_unicode=True, default_flow_style=False)
         else:
             print(f'"{section}" 已存在，写入失败')
 
