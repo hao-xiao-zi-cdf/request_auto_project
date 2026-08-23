@@ -1,7 +1,8 @@
+import sys
 import yaml
 import traceback
 from config import setting
-# from common.recordlog import logs
+from common.recordlog import logs
 
 
 class OperationConfig:
@@ -14,7 +15,8 @@ class OperationConfig:
             with open(self.__filepath, 'r', encoding='utf-8') as f:
                 self.conf = yaml.safe_load(f)
         except Exception as e:
-            print(f"读取配置文件失败: {e}")
+            # 记录异常信息及完整堆栈
+            logs.error(f"读取配置文件失败: {e}\n{traceback.format_exc()}")
             self.conf = {}
 
         self.type = self.get_report_type('type')
@@ -37,7 +39,7 @@ class OperationConfig:
         try:
             return self.conf[section][option]
         except (KeyError, TypeError) as e:
-            print(f"读取配置项 [{section}] -> [{option}] 失败: {e}")
+            logs.error(traceback.format_exc())
             return ''
 
     def write_config_data(self, section, option_key, option_value):
@@ -52,7 +54,7 @@ class OperationConfig:
             with open(self.__filepath, 'w', encoding='utf-8') as f:
                 yaml.dump(self.conf, f, allow_unicode=True, default_flow_style=False)
         else:
-            print(f'"{section}" 已存在，写入失败')
+            logs.info(f'"{section}" 值已存在，写入失败')
 
     def get_section_mysql(self, option):
         """获取 MYSQL 段下的配置项"""

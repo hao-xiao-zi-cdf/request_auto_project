@@ -16,7 +16,7 @@ __pycache__/
 *.iml
 *.ipr
 *.iws
-config/config.ini
+config/config_test.yaml
 
 # VS Code (以防混用)
 .vscode/
