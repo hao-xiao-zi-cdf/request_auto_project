@@ -20,7 +20,6 @@ def remove_file(filepath, endlst):
     except Exception as e:
         logs.error(e)
 
-
 def remove_directory(path):
     """
     删除文件（注意：仅支持删除文件，不支持删除目录）

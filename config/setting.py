@@ -16,7 +16,7 @@ API_TIMEOUT = 60
 REPORT_TYPE = 'allure'
 
 # 是否发送钉钉消息
-dd_msg = False
+DD_MSG = False
 
 # 文件路径
 FILE_PATH = {

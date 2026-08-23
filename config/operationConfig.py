@@ -1,4 +1,3 @@
-import sys
 import yaml
 import traceback
 from config import setting
