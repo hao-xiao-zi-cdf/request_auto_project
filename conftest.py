@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
-import time
 import warnings
 import pytest
 
+from common.feishuRobot import send_feishu_msg
 from common.yaml_handler import YamlHandler
 from base.removefile import remove_file
 from common.dingRobot import send_dd_msg
-from config.setting import DD_MSG
+from config.setting import DD_MSG, FS_MSG
 
 @pytest.fixture(scope="session", autouse=True)
 def clear_extract():
@@ -20,15 +20,16 @@ def clear_extract():
     YamlHandler().clear_yaml_data()
     remove_file("./report/temp", ['json', 'txt', 'attach', 'properties'])
 
-
+# 钩子函数，测试结束后执行
 def pytest_terminal_summary(terminalreporter, exitstatus, config):
-    """测试结束后收集结果摘要，并按配置推送钉钉通知"""
+    """测试结束后收集结果摘要，并按配置推送通知"""
     total = terminalreporter._numcollected
     passed = len(terminalreporter.stats.get('passed', []))
     failed = len(terminalreporter.stats.get('failed', []))
     error = len(terminalreporter.stats.get('error', []))
     skipped = len(terminalreporter.stats.get('skipped', []))
-    duration = time.time() - terminalreporter._sessionstarttime
+    # pytest 9.x 中 _session_start 是 Instant 对象，通过 elapsed().seconds 获取耗时（秒）
+    duration = terminalreporter._session_start.elapsed().seconds
 
     summary = (
         f"自动化测试结果，通知如下，请着重关注测试失败的接口，具体执行结果如下：\n"
@@ -43,3 +44,5 @@ def pytest_terminal_summary(terminalreporter, exitstatus, config):
 
     if DD_MSG:
         send_dd_msg(summary)
+    if FS_MSG:
+        send_feishu_msg(summary)

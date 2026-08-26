@@ -77,7 +77,7 @@ class SendRequest:
             result = session.request(**kwargs)
             set_cookie = requests.utils.dict_from_cookiejar(result.cookies)
             if set_cookie:
-                cookie = {'Cookie': set_cookie}
+                cookie = {'cookie': set_cookie}
                 self.yamlHandler.write_yaml_data(cookie)
                 logs.info(f"cookie：{cookie}")
             logs.info(f"接口返回信息：{result.text if result.text else result}")

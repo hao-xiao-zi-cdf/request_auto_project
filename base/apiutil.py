@@ -61,19 +61,19 @@ class RequestBase:
         url = url_host + base_info['url']
         method = base_info['method']
         header = self.replace_load(base_info['header'])
-        # 记录请求信息到 allure 报告
-        allure.attach(f'接口名称：{api_name}', api_name, allure.attachment_type.TEXT)
-        allure.attach(f'接口地址：{url}', api_name, allure.attachment_type.TEXT)
-        allure.attach(f'请求方法：{method}', api_name, allure.attachment_type.TEXT)
-        allure.attach(f'请求头：{header}', api_name, allure.attachment_type.TEXT)
+        # 记录请求信息到 allure 报告（附件名用独立描述，避免全部显示成接口名）
+        allure.attach(f'接口名称：{api_name}', '接口名称', allure.attachment_type.TEXT)
+        allure.attach(f'接口地址：{url}', '接口地址', allure.attachment_type.TEXT)
+        allure.attach(f'请求方法：{method}', '请求方法', allure.attachment_type.TEXT)
+        allure.attach(f'请求头：{header}', '请求头', allure.attachment_type.TEXT)
         # 处理 cookie（替换占位符后 eval 转为字典）
         cookie = None
         if base_info.get('cookies') is not None:
             cookie = eval(self.replace_load(base_info['cookies']))
         case_name = test_case.pop('case_name')
-        allure.attach(f'测试用例名称：{case_name}', api_name, allure.attachment_type.TEXT)
+        allure.attach(f'测试用例名称：{case_name}', '测试用例名称', allure.attachment_type.TEXT)
         # 处理断言和参数提取配置
-        validation = eval(self.replace_load(test_case.get('validation')))
+        validation = eval(self.replace_load(test_case.pop('validation', None)))
         extract = test_case.pop('extract', None)
         extract_list = test_case.pop('extract_list', None)
         # 替换请求参数中的占位符

@@ -1,8 +1,13 @@
 import pytest
 import allure
-from common.yaml_handler import get_testcase_yaml
-from base.apiutil import RequestBase
+import os
+import platform
+import sys
 from common.recordlog import logs
+from base.apiutil import RequestBase
+from config.setting import FILE_PATH
+from config.operationConfig import OperationConfig
+from common.yaml_handler import get_testcase_yaml
 from common.connection import ConnectMysql
 
 """
@@ -13,6 +18,7 @@ from common.connection import ConnectMysql
 -autouse：默认为false，不会自动执行，需要手动调用，为true可以自动执行，不需要调用
 """
 
+config = OperationConfig()
 
 @pytest.fixture(autouse=True)
 def start_test_and_end():
@@ -20,12 +26,33 @@ def start_test_and_end():
     yield
     logs.info('-------------接口测试结束--------------')
 
+@pytest.fixture(scope='session', autouse=True)
+def allure_environment():
+    """
+    动态写入 allure 报告的环境信息（environment.properties）
+    """
+    env_info = {
+        'Python': sys.version.split()[0],
+        'OS': f'{platform.system()} {platform.release()}',
+        'BaseUrl': config.get_section_for_data('api_envi', 'host'),
+        'environment': config.get_section_for_data('environment', 'type'),
+        'Project': config.get_section_for_data('environment', 'project')
+    }
+    properties_path = os.path.join(FILE_PATH['TEMP'], 'environment.properties')
+    os.makedirs(os.path.dirname(properties_path), exist_ok=True)
+    with open(properties_path, 'w', encoding='ascii') as f:
+        for key, value in env_info.items():
+            # Java 的 properties 文件默认按 ISO-8859-1 解析，
+            # 中文需转义为 \uXXXX 形式，否则 allure 报告中会显示乱码
+            value = str(value).encode('unicode_escape').decode('ascii')
+            f.write(f'{key}={value}\n')
+    yield
 
 @pytest.fixture(scope='session', autouse=True)
 @allure.story("登录")
 def system_login():
     try:
-        api_info = get_testcase_yaml('./data/loginName.yaml')
+        api_info = get_testcase_yaml('./testdata/LoginManager/login_name.yaml')
         RequestBase().specification_yaml(api_info[0][0], api_info[0][1])
     except Exception as e:
         logs.error(f'登录接口出现异常，导致后续接口无法继续运行，请检查程序！，{e}')

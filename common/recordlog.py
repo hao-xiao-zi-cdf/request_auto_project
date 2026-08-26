@@ -9,7 +9,6 @@ log_path = setting.FILE_PATH["LOG"]
 os.makedirs(log_path, exist_ok=True)
 logfile_name = os.path.join(log_path, f"test.{datetime.datetime.now():%Y%m%d}.log")
 
-
 class RecordLog:
     """日志模块：负责清理过期日志并创建 logger 实例"""
 
@@ -28,7 +27,7 @@ class RecordLog:
         """清理超过保留天数的日志文件"""
         cutoff = (datetime.datetime.now() - datetime.timedelta(days=self.LOG_RETENTION_DAYS)).timestamp()
         for filename in os.listdir(log_path):
-            # 遍历日志目录下的所有文件，过滤掉无扩展名的文件
+            # 遍历日志目录下的所有文件，拆分文件名和拓展名，过滤掉无扩展名的文件
             if os.path.splitext(filename)[1]:
                 filepath = os.path.join(log_path, filename)
                 # 获取文件创建时间，若早于截止时间则删除

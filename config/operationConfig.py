@@ -3,7 +3,6 @@ import traceback
 from config import setting
 from common.recordlog import logs
 
-
 class OperationConfig:
     """封装读取 *.yaml 配置文件的工具类"""
 
@@ -62,3 +61,7 @@ class OperationConfig:
     def get_report_type(self, option):
         """获取 REPORT_TYPE 段下的配置项"""
         return self.get_section_for_data('REPORT_TYPE', option)
+
+    def get_section_jenkins(self, option):
+        """获取 JENKINS 段下的配置项"""
+        return self.get_section_for_data("JENKINS", option)
