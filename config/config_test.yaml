@@ -27,7 +27,7 @@ REPORT_TYPE:
 JENKINS:
   url: http://127.0.0.1:8080
   username: admin
-  password: 123456
+  password: '123456'  # 必须加引号，否则 YAML 解析为整数，python-jenkins 会报 encode 错误
   job_name: request_auto_project_task  # 测试任务名称
   timeout: 60
 

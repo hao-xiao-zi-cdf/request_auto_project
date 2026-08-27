@@ -7,10 +7,11 @@ class JenkinsHandler:
 
     def __init__(self):
         conf = OperationConfig()
+        # 强制转 str：YAML 会把纯数字密码/用户名解析为整数，而 python-jenkins 要求字符串（内部调 encode）
         self.__server = jenkins.Jenkins(
-            url=conf.get_section_jenkins('url'),
-            username=conf.get_section_jenkins('username'),
-            password=conf.get_section_jenkins('password'),
+            url=str(conf.get_section_jenkins('url')),
+            username=str(conf.get_section_jenkins('username')),
+            password=str(conf.get_section_jenkins('password')),
             timeout=int(conf.get_section_jenkins('timeout'))
         )
         self.job_name = conf.get_section_jenkins('job_name')
