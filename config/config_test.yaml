@@ -34,7 +34,7 @@ JENKINS:
   url: http://127.0.0.1:8080
   username: admin
   password: 123456
-  job_name: interface_test  # 测试任务名称
+  job_name: request_auto_project_task  # 测试任务名称
   timeout: 60
 
 # 报告类型：默认 allure，若设为 tm 则生成 tmreport 报告
