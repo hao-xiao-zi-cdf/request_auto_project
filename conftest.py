@@ -3,11 +3,11 @@ import warnings
 import pytest
 
 from common.feishuRobot import send_feishu_msg
-from common.sendemail import BuildEmail
 from common.yaml_handler import YamlHandler
+from common.recordlog import logs
 from base.removefile import remove_file
 from common.dingRobot import send_dd_msg
-from config.setting import DD_MSG, FS_MSG, EMAIL_MSG
+from config.setting import DD_MSG, FS_MSG, JENKINS_ENHANCE
 
 @pytest.fixture(scope="session", autouse=True)
 def clear_extract():
@@ -43,16 +43,22 @@ def pytest_terminal_summary(terminalreporter, exitstatus, config):
     )
     print(summary)
 
+    # Jenkins 构建信息增强：追加构建编号与报告链接，方便收到通知后直接点击查看
+    # 本地运行或 Jenkins 不可达时查询会失败，捕获后降级为普通通知，不影响测试流程；
+    # 局部导入避免未安装 python-jenkins 的环境在加载 conftest 时直接报错
+    if JENKINS_ENHANCE:
+        try:
+            from common.jenkins_handler import JenkinsHandler
+            build_info = JenkinsHandler().get_build_enhance_info()
+            summary += (
+                f"\n构建编号：第{build_info['build_number']}次"
+                f"\n构建地址：{build_info['build_url']}"
+                f"\nAllure 报告：{build_info['allure_url']}"
+            )
+        except Exception as e:
+            logs.error(f'查询 Jenkins 构建信息失败，降级发送普通通知：{e}')
+
     if DD_MSG:
         send_dd_msg(summary)
     if FS_MSG:
         send_feishu_msg(summary)
-    # 邮件通知：直接使用本地 pytest 统计结果发送（此时 Jenkins 构建尚未结束，无法查询其统计）
-    if EMAIL_MSG:
-        # 将秒数格式化为"X时X分X秒"
-        hour, remainder = divmod(duration, 3600)
-        minute, seconds = divmod(remainder, 60)
-        BuildEmail().main_by_counts(
-            passed, failed, skipped, error,
-            f'执行时长：{hour}时{minute}分{seconds}秒'
-        )

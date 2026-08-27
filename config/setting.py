@@ -27,8 +27,8 @@ DD_MSG = True
 # 是否发送飞书消息
 FS_MSG = True
 
-# 是否发送结果邮件（测试结束后由 conftest.py 钩子用本地统计自动发送）
-EMAIL_MSG = True
+# 是否在钉钉/飞书通知中附加 Jenkins 构建信息（构建编号、构建地址、Allure 报告链接）
+JENKINS_ENHANCE = True
 
 # 文件路径
 FILE_PATH = {

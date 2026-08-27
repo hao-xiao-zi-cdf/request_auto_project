@@ -37,6 +37,24 @@ class JenkinsHandler:
         """获取最新构建的测试报告"""
         return self.__server.get_build_test_report(self.job_name, self.get_job_number())
 
+    def get_build_enhance_info(self):
+        """
+        获取构建编号、构建地址与 Allure 报告链接等链接类信息
+        构建进行中即可查询，用于增强钉钉/飞书通知内容；
+        最终构建结果在构建结束前未知，故此处仅提供链接
+        :return: 包含 build_number、build_url、allure_url 的字典
+        """
+        build_num = self.get_job_number()
+        # python-jenkins 1.x 无 get_job_url 方法，改用 get_job_info 的 url 字段（新旧版本均兼容）
+        job_url = self.__server.get_job_info(self.job_name)['url']
+        build_url = f'{job_url}{build_num}/'
+        return {
+            'build_number': build_num,
+            'build_url': build_url,
+            # Allure Jenkins 插件生成报告页的固定相对路径
+            'allure_url': f'{build_url}allure/'
+        }
+
     def report_success_or_fail(self):
         """
         统计测试报告的成功数、失败数、跳过数、成功率及执行时长，

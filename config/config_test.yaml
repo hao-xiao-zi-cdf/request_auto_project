@@ -1,4 +1,4 @@
-# 放业务运行所需的环境数据——接口地址、数据库账号、邮箱、Jenkins、机器人密钥，随环境变化
+# 放业务运行所需的环境数据——接口地址、数据库账号、机器人密钥，随环境变化
 
 # 测试环境配置
 environment:
@@ -18,28 +18,18 @@ MYSQL:
   password: root
   database: test
 
-# 邮件通知配置
-EMAIL:
-  host: smtp.163.com
-  port: 25
-  user: 1355959555@163.com
-  # 邮箱密钥
-  passwd: NGpr5gsyJcQsEbDz
-  # 多个收件人用分号分隔
-  addressee: 1355959555@163.com;3425588767@qq.com
-  subject: 风铃选品接口自动化测试
+# 报告类型：默认 allure，若设为 tm 则生成 tmreport 报告
+REPORT_TYPE:
+  type: allure
 
-# JENKINS配置
+# Jenkins配置（查询构建编号、报告链接，用于钉钉/飞书通知增强）
+# url 需为同事可访问的地址；部署到公司服务器后替换为服务器地址即可，代码无需改动
 JENKINS:
   url: http://127.0.0.1:8080
   username: admin
   password: 123456
   job_name: request_auto_project_task  # 测试任务名称
   timeout: 60
-
-# 报告类型：默认 allure，若设为 tm 则生成 tmreport 报告
-REPORT_TYPE:
-  type: allure
 
 # 钉钉通知配置
 DING_DING:
