@@ -27,6 +27,9 @@ DD_MSG = True
 # 是否发送飞书消息
 FS_MSG = True
 
+# 是否发送结果邮件（测试结束后由 conftest.py 钩子用本地统计自动发送）
+EMAIL_MSG = True
+
 # 文件路径
 FILE_PATH = {
     'CONFIG': os.path.join(DIR_BASE, 'config/config_test.yaml'),

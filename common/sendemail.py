@@ -76,19 +76,17 @@ class SendEmail:
 class BuildEmail(SendEmail):
     """组装测试结果摘要并发送邮件"""
 
-    def main(self, success, failed, error, not_running, atta_file=None):
+    def _compose_and_send(self, success_num, fail_num, error_num, notrun_num,
+                          extra_info='', atta_file=None):
         """
-        统计测试结果并发送邮件
-        :param success: 通过的用例列表
-        :param failed: 失败的用例列表
-        :param error: 错误的用例列表
-        :param not_running: 未执行的用例列表
+        统计通过率、组装邮件正文并发送（两种统计入口的公共逻辑）
+        :param success_num: 通过数量
+        :param fail_num: 失败数量
+        :param error_num: 错误数量
+        :param notrun_num: 未执行数量
+        :param extra_info: 正文末尾追加的补充信息（如执行时长、报告链接）
         :param atta_file: 附件路径（可选）
         """
-        success_num = len(success)
-        fail_num = len(failed)
-        error_num = len(error)
-        notrun_num = len(not_running)
         total = success_num + fail_num + error_num + notrun_num
         execute_case = success_num + fail_num
 
@@ -107,6 +105,31 @@ class BuildEmail(SendEmail):
             f'通过{success_num}个，失败{fail_num}个，'
             f'错误{error_num}个，未执行{notrun_num}个，'
             f'通过率{pass_result}，失败率{fail_result}，错误率{err_result}。'
-            f'详细测试结果请参见附件。'
+            f'{extra_info}'
         )
         self.build_content(subject, content, addressee, atta_file)
+
+    def main(self, success, failed, error, not_running, atta_file=None):
+        """
+        按用例列表统计测试结果并发送邮件
+        :param success: 通过的用例列表
+        :param failed: 失败的用例列表
+        :param error: 错误的用例列表
+        :param not_running: 未执行的用例列表
+        :param atta_file: 附件路径（可选）
+        """
+        self._compose_and_send(
+            len(success), len(failed), len(error), len(not_running),
+            '详细测试结果请参见附件。', atta_file
+        )
+
+    def main_by_counts(self, pass_count, fail_count, skip_count, error_count=0, extra_info=''):
+        """
+        按结果数量统计发送邮件（本地 pytest 统计、Jenkins 构建统计均可使用）
+        :param pass_count: 通过数量
+        :param fail_count: 失败数量
+        :param skip_count: 跳过/未执行数量
+        :param error_count: 错误数量（无错误分类时默认 0）
+        :param extra_info: 正文末尾追加的补充信息（如执行时长、报告链接）
+        """
+        self._compose_and_send(pass_count, fail_count, error_count, skip_count, extra_info)

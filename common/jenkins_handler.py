@@ -48,18 +48,19 @@ class JenkinsHandler:
         fail_count = report_info['failCount']
         skip_count = report_info['skipCount']
         total_count = pass_count + fail_count + skip_count
-        duration = int(report_info['duration'])
+        duration = report_info['duration']
 
-        # 将秒数转换为"X时X分X秒"格式
-        hour, remainder = divmod(duration, 3600)
+        # 将秒数转换为"X时X分X秒"格式（duration 可能为小数字符串，先转 float 再取整）
+        hour, remainder = divmod(int(float(duration)), 3600)
         minute, seconds = divmod(remainder, 60)
         execute_duration = f'{hour}时{minute}分{seconds}秒'
 
-        # 从控制台日志中提取 allure 报告链接
+        # 从控制台日志中提取 allure 报告链接（未匹配到时返回空字符串，避免 None.group() 报错）
         console_log = self.get_console_log()
-        report_line = re.search(
+        match = re.search(
             rf'http://[\d.]+:\d+/job/{self.job_name}/(.*?)allure', console_log
-        ).group(0)
+        )
+        report_line = match.group(0) if match else ''
 
         return {
             'total': total_count,

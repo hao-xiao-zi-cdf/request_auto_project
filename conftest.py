@@ -3,10 +3,11 @@ import warnings
 import pytest
 
 from common.feishuRobot import send_feishu_msg
+from common.sendemail import BuildEmail
 from common.yaml_handler import YamlHandler
 from base.removefile import remove_file
 from common.dingRobot import send_dd_msg
-from config.setting import DD_MSG, FS_MSG
+from config.setting import DD_MSG, FS_MSG, EMAIL_MSG
 
 @pytest.fixture(scope="session", autouse=True)
 def clear_extract():
@@ -46,3 +47,12 @@ def pytest_terminal_summary(terminalreporter, exitstatus, config):
         send_dd_msg(summary)
     if FS_MSG:
         send_feishu_msg(summary)
+    # 邮件通知：直接使用本地 pytest 统计结果发送（此时 Jenkins 构建尚未结束，无法查询其统计）
+    if EMAIL_MSG:
+        # 将秒数格式化为"X时X分X秒"
+        hour, remainder = divmod(duration, 3600)
+        minute, seconds = divmod(remainder, 60)
+        BuildEmail().main_by_counts(
+            passed, failed, skipped, error,
+            f'执行时长：{hour}时{minute}分{seconds}秒'
+        )

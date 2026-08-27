@@ -10,3 +10,5 @@ PyYAML==6.0.3
 jsonpath==0.82.2
 # MySQL 数据库（datadb_init 数据预置/清理用）
 PyMySQL==1.2.0
+# Jenkins API 调用（构建完成后查询构建结果，用于邮件通知）
+python-jenkins==2.0.0
