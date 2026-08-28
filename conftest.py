@@ -7,7 +7,8 @@ from common.yaml_handler import YamlHandler
 from common.recordlog import logs
 from base.removefile import remove_file
 from common.dingRobot import send_dd_msg
-from config.setting import DD_MSG, FS_MSG, JENKINS_ENHANCE
+from config.setting import DD_MSG, FS_MSG
+# from config.setting import JENKINS_ENHANCE
 
 @pytest.fixture(scope="session", autouse=True)
 def clear_extract():
@@ -44,7 +45,7 @@ def pytest_terminal_summary(terminalreporter, exitstatus, config):
     print(summary)
 
     # Jenkins 构建信息增强：追加构建编号与报告链接，方便收到通知后直接点击查看
-    # 本地运行或 Jenkins 不可达时查询会失败，捕获后降级为普通通知，不影响测试流程；
+    # 本地运行或 Jenkins 不可达时查询会失败，捕获后降级为普通通知，不影响测试流程
     # if JENKINS_ENHANCE:
     #     try:
     #         from common.jenkins_handler import JenkinsHandler
