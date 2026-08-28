@@ -28,7 +28,7 @@ DD_MSG = True
 FS_MSG = True
 
 # 是否在钉钉/飞书通知中附加 Jenkins 构建信息（构建编号、构建地址、Allure 报告链接）
-JENKINS_ENHANCE = True
+# JENKINS_ENHANCE = True
 
 # 文件路径
 FILE_PATH = {
