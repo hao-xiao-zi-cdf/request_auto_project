@@ -63,6 +63,9 @@ class JenkinsHandler:
         :return: 包含统计信息和报告链接的字典
         """
         report_info = self.get_build_report()
+        # python-jenkins 获取测试报告失败时返回 None，先判空收窄类型，避免下标访问 None 报 TypeError
+        if report_info is None:
+            raise ValueError(f'获取 job [{self.job_name}] 最新构建的测试报告失败，无法统计测试结果')
         pass_count = report_info['passCount']
         fail_count = report_info['failCount']
         skip_count = report_info['skipCount']
